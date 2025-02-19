@@ -1,92 +1,73 @@
 
+const ulTodo = document.querySelector('.js--todos-wrapper');
+const btnAddTodo = document.querySelector('.form__btn');
+const inputTodo = document.querySelector('.js--form__input');
 
+function saveToLocalStorage() {
+    localStorage.setItem('todos', ulTodo.innerHTML);
+}
 
-const formBtn = document.querySelector('.form__btn');
-const formInput = document.querySelector('.js--form__input');
-
-// ---------------------------------------------------------------------------
-formBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    const formInputValue = formInput.value.trim();
-    if (formInputValue === '') {
-        return;
+function loadFromLocalStorage() {
+    const savedData = localStorage.getItem('todos');
+    if (savedData) {
+        ulTodo.innerHTML = savedData;
     }
+}
 
-    const todoItems = document.querySelectorAll('.todo-item');
+loadFromLocalStorage();
 
-    for (let item of todoItems) {
+ulTodo.addEventListener('click', (event) => {
+    if (event.target.classList.contains('todo-item__delete')) {
+        event.target.parentElement.remove();
+        saveToLocalStorage();
+    }
+});
 
-        const description = item.querySelector('.todo-item__description');
+ulTodo.addEventListener('change', (event) => {
+    if (event.target.type === 'checkbox') {
+        const listItem = event.target.closest('.todo-item');
 
-        if (description.textContent === 'Text') {
-            description.textContent = formInputValue;
-            formInput.value = '';
-            localStorage.setItem(`descriptionText`, formInputValue);
-            return;
+        if (event.target.checked) {
+            event.target.setAttribute('checked', 'checked');
+            listItem.classList.add('todo-item--checked');
+        } else {
+            event.target.removeAttribute('checked');
+            listItem.classList.remove('todo-item--checked');
         }
+
+        saveToLocalStorage();
     }
 });
-// --------------------------------------------------------------------------------------
-const localStorageSavedDescription = localStorage.getItem(`descriptionText`);
-if (localStorageSavedDescription) {
-    document.querySelector('.todo-item__description').textContent = localStorageSavedDescription;
-}
-// --------------------------------------------------------------------------------------
-document.querySelectorAll('.todo-item__delete').forEach((deleteBtn) => {
-    deleteBtn.addEventListener('click', (event) => {
 
-        const itemLi = event.target.closest('.todo-item');
-        const description = itemLi.querySelector('.todo-item__description');
-        const checkbox = itemLi.querySelector('input[type="checkbox"]');
+btnAddTodo.addEventListener('click', (event) => {
+    event.preventDefault();
+    const inputTodoValue = inputTodo.value.trim();
 
-        description.textContent = 'Text';
-        checkbox.checked = false;
+    if (inputTodoValue === '') return;
 
-        localStorage.setItem('descriptionDeleteText', description.textContent);
-        localStorage.setItem('checkbox', checkbox.checked);
-    });
+    const liAddTodo = document.createElement('li');
+    liAddTodo.classList.add('todo-item');
+
+    const checkboxAdd = document.createElement('input');
+    checkboxAdd.type = 'checkbox';
+
+    const spanAdd = document.createElement('span');
+    spanAdd.classList.add('todo-item__description');
+    spanAdd.textContent = inputTodoValue;
+
+    const btnDel = document.createElement('button');
+    btnDel.classList.add('todo-item__delete');
+    btnDel.textContent = 'Видалити';
+
+    liAddTodo.appendChild(checkboxAdd);
+    liAddTodo.appendChild(spanAdd);
+    liAddTodo.appendChild(btnDel);
+
+    ulTodo.appendChild(liAddTodo);
+
+    inputTodo.value = '';
+
+    saveToLocalStorage();
 });
-// -------------------------------------------------------------------------------------------
-document.querySelectorAll('.todo-item input[type="checkbox"]').forEach((checkbox) => {
-    checkbox.addEventListener('change', () => {
-
-        localStorage.setItem('checkbox', checkbox.checked);
-    });
-});
-// ----------------------------------------------------------------------------------------
-const localStorageSavedCheckbox = localStorage.getItem('checkbox');
-if (localStorageSavedCheckbox !== null) {
-    document.querySelector('.todo-item input[type="checkbox"]').checked = JSON.parse(localStorageSavedCheckbox);
-}
-// ---------------------------------------------------------------------------------------------------
 
 
-
-// document.querySelectorAll('.todo-item__delete').forEach((deleteBtn) => {
-//     deleteBtn.addEventListener('click', (event) => {
-
-//         const parent = event.target.parentElement;
-
-//         if (parent.classList.contains('todo-item')) {
-
-//             const description = parent.querySelector('.todo-item__description');
-//             const checkbox = parent.querySelector('input[type="checkbox"]');
-
-//             description.textContent = 'Text';
-//             checkbox.checked = false;
-//         }
-//     });
-// });
-
-// --------------------------------------------------------------------
-// const person = {
-//     name: 'Oleh',
-//     age: 40
-// }
-// const personJson = JSON.stringify(person, null, ' ');
-// console.log(personJson);
-
-// const personParce = JSON.parse(personJson);
-// console.log(personParce);
-
-// ------------------------------------------------------------------------
